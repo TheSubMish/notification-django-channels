@@ -8,18 +8,26 @@ class Notification(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name="Notification Sender"
+        db_index=True,
+        verbose_name="Notification Sender",
+        related_name='sent_notifications'
     )
     receiver = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name="Notification Receiver"
+        db_index=True,
+        verbose_name="Notification Receiver",
+        related_name='received_notifications'
     )
     message = models.CharField(
         max_length=255,
         verbose_name="Notification Message"
+    )
+    is_read = models.BooleanField(
+        default=False,
+        verbose_name="Notification Read Status"
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
