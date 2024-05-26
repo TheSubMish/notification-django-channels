@@ -15,3 +15,9 @@ class CreateNotification(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'msg':'Notification created successfully'},status=status.HTTP_201_CREATED)
+
+
+def list_notifications(request, *args, **kwargs):
+    notifications = Notification.objects.filter(receiver=request.user)
+    user_id = request.user.id
+    return render(request, 'index.html', {'notifications': notifications,'user_id':user_id})

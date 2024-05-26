@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification</title>
+</head>
+<body>
+    <div id="notifications">
+        {% for notification in notifications %}
+            <p><strong>{{ notification.sender }}</strong>: {{ notification.message }} ({{ notification.created_at }})</p>
+        {% endfor %}
+    </div>
+</body>
+<script>
+    const userId = "{{ user_id }}";
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const host = window.location.host;
+    const endpoint = `/ws/notification/${userId}/`;
+
+    function connect() {
+        const notificationSocket = new WebSocket(`${protocol}${host}${endpoint}`);
+
+        notificationSocket.onopen = function(e) {
+            console.log("Successfully connected to the WebSocket.");
+        };
+
+        notificationSocket.onclose = function(e) {
+            console.log("WebSocket connection closed unexpectedly. Trying to reconnect in 2s...");
+            setTimeout(function() {
+                console.log("Reconnecting...");
+                connect();
+            }, 2000);
+        };
+
+        notificationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data);
+
+            switch (data.type) {
+                case "send_notification":
+                    displayNotification(data.message);
+                    break;
+                default:
+                    console.error("Unknown message type!");
+                    break;
+            }
+        };
+
+        notificationSocket.onerror = function(err) {
+            console.log("WebSocket encountered an error: " + err.message);
+            console.log("Closing the socket.");
+            notificationSocket.close();
+        };
+    }
+
+    function displayNotification(message) {
+        const notificationsDiv = document.getElementById('notifications');
+        const notificationData = message;
+        const newNotification = document.createElement('p');
+        newNotification.innerHTML = `<strong>${notificationData.sender}</strong>: ${notificationData.message} (${notificationData.created_at})`;
+        notificationsDiv.appendChild(newNotification);
+    }
+
+    connect();
+</script>
+</html>
