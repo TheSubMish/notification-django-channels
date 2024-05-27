@@ -50,5 +50,6 @@ class NotificationConsumer(WebsocketConsumer):
 
         # Send the message to WebSocket
         self.send(text_data=json.dumps({
+            'type':'send_notification',
             'message': message
         }))

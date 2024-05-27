@@ -35,7 +35,6 @@
 
         notificationSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            console.log(data);
 
             switch (data.type) {
                 case "send_notification":
@@ -55,8 +54,14 @@
     }
 
     function displayNotification(message) {
+        let notificationData;
+        try {
+            notificationData = JSON.parse(message);
+        } catch (e) {
+            console.error("Error parsing message:", e);
+            notificationData = message;  // Assuming message is already an object
+        }
         const notificationsDiv = document.getElementById('notifications');
-        const notificationData = message;
         const newNotification = document.createElement('p');
         newNotification.innerHTML = `<strong>${notificationData.sender}</strong>: ${notificationData.message} (${notificationData.created_at})`;
         notificationsDiv.appendChild(newNotification);

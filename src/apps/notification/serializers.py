@@ -31,8 +31,7 @@ class NotificationSerializer(serializers.ModelSerializer):
                 message=validated_data.get('message'),
                 is_read=validated_data.get('is_read', False)
             )
+            notification.save()
             notifications.append(notification)
-
-        Notification.objects.bulk_create(notifications)
 
         return validated_data
